@@ -23,12 +23,15 @@ public class NewThread implements Runnable
         {
             System.out.println("\nThread started: " + Thread.currentThread() + "\n");
             Request req = new Request(server);
-            req.run();
+            req.readRequest();
             url = req.get_url();
-            PluginManager pm = new PluginManager(url);
-            String plugin = pm.getPlugin();
-            Response resp = new Response(server, plugin);
-            resp.sendResponse();
+            if(url != null)
+            {
+                PluginManager pm = new PluginManager(url);
+                String plugin = pm.getPlugin();
+                Response resp = new Response(server, plugin);
+                resp.sendResponse();
+            }
             server.close();
             System.out.println("\nclosed Connection " + Thread.currentThread() + "\n");
         }

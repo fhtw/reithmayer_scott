@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
  *
  * @author if12b061 & if12b052
  */
-public class Request implements Runnable {
+public class Request {
     private Socket server;
     private String header = "";
     private String method = "", url = "", protocol = "";
@@ -19,27 +19,33 @@ public class Request implements Runnable {
       this.server=server;
     }
 
-    @Override
-    public void run()
+    public void readRequest()
     {
         try
         {
             BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
             String line = in.readLine();
-            StringTokenizer tok = new StringTokenizer(line);
-            method = tok.nextToken();
-            url = tok.nextToken();
-            protocol = tok.nextToken();
-/*          //  restlichen header speichern
-            while((line = in.readLine()) != null && !line.equals(""))
+            if(line != null)
             {
-              header = header + "\n" + line;
-            }
-            System.out.println("Header:" + header);
+                StringTokenizer tok = new StringTokenizer(line);
+                method = tok.nextToken();
+                url = tok.nextToken();
+                protocol = tok.nextToken();
+              //  restlichen header speichern
+/*                while((line = in.readLine()) != null && !line.equals(""))
+                {
+                  header = header + "\n" + line;
+                }
+                System.out.println("Header:" + header);
 */
-            System.out.println("Method: " + method);
-            System.out.println("URL: " + url);
-            System.out.println("Protocol: " + protocol);
+                System.out.println("Method: " + method);
+                System.out.println("URL: " + url);
+                System.out.println("Protocol: " + protocol);
+            }
+            else
+            {
+                url = null;
+            }
         }
         catch (UnknownHostException ex)
         {
