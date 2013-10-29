@@ -12,7 +12,7 @@ import java.util.StringTokenizer;
 public class Request implements Runnable {
     private Socket server;
     private String header = "";
-    private String method, url, protocol;
+    private String method = "", url = "", protocol = "";
 
     Request(Socket server)
     {

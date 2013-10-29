@@ -14,16 +14,47 @@ import java.io.IOException;
  *
  * @author if12b061 & if12b052
  */
-public class Response implements Runnable{
+public class Response{
     private Socket server;
+    private String plugin;
 
-    Response(Socket server)
+    Response(Socket server, String plugin)
     {
-        this.server=server;
+        this.server = server;
+        this.plugin = plugin;
     }
 
-    @Override
-    public void run()
+    public void sendResponse()
+    {
+        try
+        {
+            PrintWriter out = new PrintWriter(server.getOutputStream());
+            // write to client
+            out.println("HTTP/1.1 200 OK");
+            out.println("Content-Type: text/html");
+            out.println("connection: close");
+            // blank line signals the end of the header
+            out.println("");
+            File f = new File("files/" + plugin);
+            FileInputStream input = new FileInputStream(f);
+            BufferedOutputStream socketOut = new BufferedOutputStream(server.getOutputStream());
+            System.out.println(f.getAbsolutePath());
+            int read = 0;
+            while ((read = input.read()) != -1) {
+                socketOut.write(read);
+//                System.out.println("write " + read + " to socket");
+            }
+            out.flush();
+            socketOut.flush();
+        }
+        catch(Exception e)
+        {
+            System.err.println("sth was wrong");
+            e.printStackTrace();
+        }
+    }
+    
+    public void index()
     {
         try
         {
@@ -132,7 +163,7 @@ public class Response implements Runnable{
             int read = 0;
             while ((read = input.read()) != -1) {
                 socketOut.write(read);
-                System.out.println("write " + read + " to socket");
+//                System.out.println("write " + read + " to socket");
             }
             out.flush();
             socketOut.flush();

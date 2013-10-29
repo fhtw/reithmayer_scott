@@ -2,8 +2,6 @@ package milst1;
 
 import java.io.*;
 import java.net.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  *
  * @author if12b061 & if12b052
@@ -18,6 +16,7 @@ public class NewThread implements Runnable
       this.server=server;
     }
 
+    @Override
     public void run()
     {
         try
@@ -26,27 +25,10 @@ public class NewThread implements Runnable
             Request req = new Request(server);
             req.run();
             url = req.get_url();
-            Response resp = new Response(server);
-            if(url.equals("/"))
-            {
-                resp.run();
-            }
-            else if(url.equals("/test"))
-            {
-                resp.test();
-            }
-            else if(url.equals("/test2"))
-            {
-                resp.test2();
-            }
-            else if(url.equals("/fileTest"))
-            {
-                resp.fileTest();
-            }
-            else
-            {
-                resp.unknown();
-            }
+            PluginManager pm = new PluginManager(url);
+            String plugin = pm.getPlugin();
+            Response resp = new Response(server, plugin);
+            resp.sendResponse();
             server.close();
             System.out.println("\nclosed Connection " + Thread.currentThread() + "\n");
         }
