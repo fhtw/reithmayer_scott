@@ -8,8 +8,6 @@ package swe1_embedded_sensor_cloud;
 
 import java.io.*; //Importiert alle Klassen aus dem I/O Paket
 import java.net.*;//Klassen die TCP/IP verbindungen supporten
-import java.security.*;//Sichere Verbindungen ?
-
 /**
  *
  * @author if12b061
@@ -20,7 +18,7 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-  private static int port=80, maxConnections=0;
+  private static int port=8080, maxConnections=0;
   // Listen for incoming connections and handle them
     public static void main(String[] args) {
 
@@ -31,11 +29,9 @@ public class Main {
       Socket server;
 
       while((i++ < maxConnections) || (maxConnections == 0)){
-        doComms connection;
-
         server = listener.accept();
-        doComms conn_c= new doComms(server);
-        Thread t = new Thread(conn_c);
+       doComms conn_c= new doComms(server);
+        Thread t = new Thread((Runnable) conn_c);
         t.start();
       }
     } catch (IOException ioe) {
@@ -46,37 +42,3 @@ public class Main {
 
 }
 
-class doComms implements Runnable {
-    private Socket server;
-    private String line,input;
-
-    doComms(Socket server) {
-      this.server=server;
-    }
-
-    public void run () {
-
-      input="";
-
-      try {
-        // Get input from the client
-        DataInputStream in = new DataInputStream (server.getInputStream());
-        PrintStream out = new PrintStream(server.getOutputStream());
-
-        while((line = in.readLine()) != null && !line.equals(".")) {
-          input=input + line;
-          out.println("I got:" + line);
-        }
-
-        // Now write to the client
-
-        System.out.println("Overall message is:" + input);
-        out.println("Overall message is:" + input);
-
-        server.close();
-      } catch (IOException ioe) {
-        System.out.println("IOException on socket listen: " + ioe);
-        ioe.printStackTrace();
-      }
-    }
-}
