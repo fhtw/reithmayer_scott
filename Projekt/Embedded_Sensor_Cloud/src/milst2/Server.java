@@ -2,6 +2,8 @@ package milst2;
 
 import java.io.*;
 import java.net.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author if12b061 & if12b052
@@ -9,7 +11,7 @@ import java.net.*;
 public class Server implements Runnable
 {
     private Socket server;
-    private String url;
+    private UrlClass url;
 
     Server(Socket server)
     {
@@ -23,12 +25,13 @@ public class Server implements Runnable
         {
             System.out.println("\nThread started: " + Thread.currentThread() + "\n");
             Request req = new Request(server);
-            req.readRequest();
-            url = req.get_url();
+            url = req.readRequest();
             if(url != null)
             {
-                StaticPlugin pm = new StaticPlugin(url);
-                String plugin = pm.getSite();
+                PluginManager pm = new PluginManager();
+                pm.loadPlugin(url);
+                StaticPlugin sp = new StaticPlugin(url.getUrl());
+                String plugin = sp.getSite();
                 Response resp = new Response(server, plugin);
                 resp.sendResponse();
             }
@@ -38,6 +41,8 @@ public class Server implements Runnable
         catch (IOException ioe)
         {
             System.out.println("IOException on socket listen: " + ioe);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

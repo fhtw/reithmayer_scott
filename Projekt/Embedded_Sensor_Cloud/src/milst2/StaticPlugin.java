@@ -11,7 +11,7 @@ package milst2;
 public class StaticPlugin {
 
     private String url;
-    private String plugin;
+    private String file;
 
     StaticPlugin(String url)
     {
@@ -22,20 +22,20 @@ public class StaticPlugin {
     {
         switch (url) {
             case "/":
-                plugin = "index.html";
+                file = "index.html";
                 break;
             case "/test":
-                plugin = "test.html";
+                file = "test.html";
                 break;
             case "/test2":
-                plugin = "test2.html";
+                file = "test2.html";
                 break;
             default:
-                plugin = "error.html";
+                file = "error.html";
                 break;
         }
         
-        return plugin;
+        return file;
     }
     
 }

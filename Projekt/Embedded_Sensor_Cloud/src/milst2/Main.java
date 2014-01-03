@@ -18,6 +18,8 @@ public class Main
             ServerSocket listener = new ServerSocket(port, 100);
             Socket server;
 
+
+            
             while(true) //endlos
             {
                 server = listener.accept();

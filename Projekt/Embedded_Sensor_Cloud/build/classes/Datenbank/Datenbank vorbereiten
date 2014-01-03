@@ -1,0 +1,23 @@
+
+JDBC Treiber runterladen & entpacken: http://msdn.microsoft.com/data/jdbc/
+    Treiber in NetBeans ins Projekt einfügen:
+        <- Links im Projects-Fenster Rechtsklick auf Libraries
+        -> Add JAR/Folder...
+        -> sqljdbc4.jar auswählen
+
+TCP/IP aktivieren
+    SQL Server Configuration Manager
+    -> SQL Server 2005 Network Configuration
+    -> TCP/IP einschalten
+
+SQL Server Browser aktivieren
+    SQL Server Configuration Manager
+    -> SQL Server 2005 Services
+    -> SQL Server Browser starten
+    Alternativ auch über services.msc
+
+Datenbankuser anlegen
+    heißt bei mir swe1 und hat nur rechte auf die Datenbank SWE1 mit der Tabelle temperature
+
+
+Eventuell alles nochmal neu starten :D

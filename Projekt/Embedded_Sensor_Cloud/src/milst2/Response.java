@@ -16,12 +16,12 @@ import java.io.IOException;
  */
 public class Response{
     private Socket server;
-    private String plugin;
+    private String file;
 
-    Response(Socket server, String plugin)
+    Response(Socket server, String file)
     {
         this.server = server;
-        this.plugin = plugin;
+        this.file = file;
     }
 
     public void sendResponse()
@@ -35,7 +35,7 @@ public class Response{
             out.println("connection: close");
             // blank line signals the end of the header
             out.println("");
-            File f = new File("files/" + plugin);
+            File f = new File("files/" + file);
             FileInputStream input = new FileInputStream(f);
             BufferedOutputStream socketOut = new BufferedOutputStream(server.getOutputStream());
             System.out.println(f.getAbsolutePath());
@@ -54,127 +54,4 @@ public class Response{
         }
     }
     
-    public void index()
-    {
-        try
-        {
-            PrintWriter out = new PrintWriter(server.getOutputStream());
-            // write to client
-            out.println("HTTP/1.1 200 OK");
-            out.println("Content-Type: text/html");
-            out.println("connection: close");
-            // blank line signals the end of the header
-            out.println("");
-            // Send the HTML page
-            out.println("<H1>Juchuuu!!! :P</H1>");  //plugin
-            out.println("<BR/>");  //plugin
-            out.println("<a href='/test'>testlink</a>");  //plugin
-            out.println("<a href='/test2'>testlink2</a>");  //plugin
-            out.println("<a href='/fileTest'>fileTest</a>");  //plugin
-            out.flush();
-        }
-        catch (IOException ioe)
-        {
-            System.out.println("IOException on socket listen: " + ioe);
-        }
-    }
-
-    public void test()
-    {
-        try
-        {
-            PrintWriter out = new PrintWriter(server.getOutputStream());
-            // write to client
-            out.println("HTTP/1.1 200 OK");
-            out.println("Content-Type: text/html");
-            out.println("connection: close");
-            // blank line signals the end of the header
-            out.println("");
-            // Send the HTML page
-            out.println("<H1>Testseite</H2>");  //plugin
-            out.println("<BR/>");  //plugin
-            out.println("<a href='/'>start</a>");  //plugin
-            out.flush();
-        }
-        catch (IOException ioe)
-        {
-            System.out.println("IOException on socket listen: " + ioe);
-        }
-    }
-    public void test2()
-    {
-        try
-        {
-            PrintWriter out = new PrintWriter(server.getOutputStream());
-            // write to client
-            out.println("HTTP/1.1 200 OK");
-            out.println("Content-Type: text/html");
-            out.println("connection: close");
-            // blank line signals the end of the header
-            out.println("");
-            // Send the HTML page
-            out.println("<H1>Testseite2</H2>");  //plugin
-            out.println("<BR/>");  //plugin
-            out.println("<a href='/'>start</a>");  //plugin
-            out.flush();
-        }
-        catch (IOException ioe)
-        {
-            System.out.println("IOException on socket listen: " + ioe);
-        }
-    }
-    public void unknown()
-    {
-        try
-        {
-            PrintWriter out = new PrintWriter(server.getOutputStream());
-            // write to client
-            out.println("HTTP/1.1 404 Not Found");
-    //        out.println("Content-Type: text/html");
-            out.println("connection: close");
-            // blank line signals the end of the header
-            out.println("");
-            out.flush();
-
-        }
-        catch (IOException ioe)
-        {
-            System.out.println("IOException on socket listen: " + ioe);
-        }
-    }
-
-
-    public void fileTest()
-    {
-        try
-        {
-            PrintWriter out = new PrintWriter(server.getOutputStream());
-            // write to client
-            out.println("HTTP/1.1 200 OK");
-            out.println("Content-Type: text/html");
-            out.println("connection: close");
-            // blank line signals the end of the header
-            out.println("");
-            File f = new File("files/test.html");
-            FileInputStream input = new FileInputStream(f);
-            BufferedOutputStream socketOut = new BufferedOutputStream(server
-                    .getOutputStream());
-            System.out.println(f.getAbsolutePath());
-            int read = 0;
-            while ((read = input.read()) != -1) {
-                socketOut.write(read);
-//                System.out.println("write " + read + " to socket");
-            }
-            out.flush();
-            socketOut.flush();
-
-//            server.close();
-//            this.serverSocket.close();
-        }
-        catch(Exception e)
-        {
-            System.err.println("sth was wrong");
-            e.printStackTrace();
-        }
-    }
 }

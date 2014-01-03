@@ -10,10 +10,10 @@ package milst2;
  * @author if12b061
  */
 public class UrlClass {
-    private String url;
+    private String url, plugin;
 
-    public UrlClass() {
-        this.url = "";
+    public UrlClass(String url) {
+        this.url = url;
     }
 
     public void divUrl(String url)
@@ -26,6 +26,12 @@ public class UrlClass {
     {
         return this.url;
 
+    }
+    
+    public String getPlugin()
+    {
+        this.plugin = "static";
+        return this.plugin;
     }
 
 }
