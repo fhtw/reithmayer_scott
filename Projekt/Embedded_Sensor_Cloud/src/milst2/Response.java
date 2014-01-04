@@ -39,7 +39,7 @@ public class Response{
             FileInputStream input = new FileInputStream(f);
             BufferedOutputStream socketOut = new BufferedOutputStream(server.getOutputStream());
             System.out.println(f.getAbsolutePath());
-            int read = 0;
+            int read;
             while ((read = input.read()) != -1) {
                 socketOut.write(read);
 //                System.out.println("write " + read + " to socket");

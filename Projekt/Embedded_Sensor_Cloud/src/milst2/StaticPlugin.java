@@ -4,30 +4,33 @@
  */
 package milst2;
 
+import java.net.Socket;
+
 /**
  *
  * @author if12b061 & if12b052
  */
-public class StaticPlugin {
+public class StaticPlugin{
 
-    private String url;
-    private String file;
+    private String url, file;
+    private Socket socket;
 
-    StaticPlugin(String url)
+    StaticPlugin(Socket s, String url)
     {
       this.url = url;
+      this.socket = s;
     }
     
-    public String getSite()
+    public void start()
     {
         switch (url) {
-            case "/":
+            case "[]":
                 file = "index.html";
                 break;
-            case "/test":
+            case "[test]":
                 file = "test.html";
                 break;
-            case "/test2":
+            case "[test2]":
                 file = "test2.html";
                 break;
             default:
@@ -35,7 +38,9 @@ public class StaticPlugin {
                 break;
         }
         
-        return file;
+//        System.out.println(url);
+        new Response(socket, file).sendResponse();
+        
     }
     
 }

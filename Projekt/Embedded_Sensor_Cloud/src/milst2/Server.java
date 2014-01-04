@@ -2,6 +2,7 @@ package milst2;
 
 import java.io.*;
 import java.net.*;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -28,12 +29,13 @@ public class Server implements Runnable
             url = req.readRequest();
             if(url != null)
             {
-                PluginManager pm = new PluginManager();
+                PluginManager pm = new PluginManager(server);
                 pm.loadPlugin(url);
-                StaticPlugin sp = new StaticPlugin(url.getUrl());
-                String plugin = sp.getSite();
-                Response resp = new Response(server, plugin);
-                resp.sendResponse();
+                pm.startPlugin(url);
+//                StaticPlugin sp = new StaticPlugin(url.getUrl());
+//                String plugin = sp.getSite();
+//                Response resp = new Response(server, plugin);
+//                resp.sendResponse();
             }
             server.close();
             System.out.println("\nclosed Connection " + Thread.currentThread() + "\n");
@@ -42,6 +44,8 @@ public class Server implements Runnable
         {
             System.out.println("IOException on socket listen: " + ioe);
         } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
