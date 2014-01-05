@@ -25,21 +25,15 @@ public class UrlClass {
     private void divUrl()
     {
         StringTokenizer st = new StringTokenizer(this.url, "/?=");
-//        int count = st.countTokens();
-//        System.out.println(count);
+        int count = st.countTokens();
+        System.out.println(count);
         while(st.hasMoreTokens())
         {
             tokens.add(st.nextToken());
         }
-//        System.out.println(tokens);
+        System.out.println(tokens);
     }
-
-    public String getUrl()
-    {
-        return this.url;
-
-    }
-    
+  
     public ArrayList getTokens()
     {
         return this.tokens;

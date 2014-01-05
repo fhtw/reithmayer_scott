@@ -4,7 +4,9 @@
  */
 package milst2;
 
+import java.io.File;
 import java.net.Socket;
+import java.util.StringTokenizer;
 
 /**
  *
@@ -12,7 +14,7 @@ import java.net.Socket;
  */
 public class StaticPlugin{
 
-    private String url, file;
+    private String url;
     private Socket socket;
 
     StaticPlugin(Socket s, String url)
@@ -23,23 +25,32 @@ public class StaticPlugin{
     
     public void start()
     {
-        switch (url) {
-            case "[]":
-                file = "index.html";
-                break;
-            case "[test]":
-                file = "test.html";
-                break;
-            case "[test2]":
-                file = "test2.html";
-                break;
-            default:
-                file = "error.html";
-                break;
-        }
-        
+        StringTokenizer st = new StringTokenizer(this.url, "[]");
+        if(st.hasMoreTokens())
+            url = st.nextToken();
+        else
+            url = "index.html";
 //        System.out.println(url);
-        new Response(socket, file).sendResponse();
+        Response resp = null;
+
+        File dir = new File("files");
+        File[] listFiles = dir.listFiles();
+        for(File f : listFiles)
+        {
+//            System.out.println(f.getName());
+            if(url.equals(f.getName()))
+            {
+                resp = new Response(socket, url);
+                break;
+            }
+        }
+
+        if(resp == null)
+            resp = new Response(socket, "error.html");
+
+        resp.sendResponse();
+//        System.out.println(url);
+        
         
     }
     

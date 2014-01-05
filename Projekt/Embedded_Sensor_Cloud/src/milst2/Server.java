@@ -32,10 +32,6 @@ public class Server implements Runnable
                 PluginManager pm = new PluginManager(server);
                 pm.loadPlugin(url);
                 pm.startPlugin(url);
-//                StaticPlugin sp = new StaticPlugin(url.getUrl());
-//                String plugin = sp.getSite();
-//                Response resp = new Response(server, plugin);
-//                resp.sendResponse();
             }
             server.close();
             System.out.println("\nclosed Connection " + Thread.currentThread() + "\n");

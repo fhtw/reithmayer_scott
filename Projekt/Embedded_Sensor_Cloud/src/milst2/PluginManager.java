@@ -31,6 +31,10 @@ public class PluginManager {
             plugins.add(plugin);
         
         
+        //PluginManager sollte nachsehen ob benötigtes Plugin bereits geladen ist, falls nicht suchen ob es zum laden vorhanden ist?
+        //mittels jar file???
+        
+        
         
         //  Reflections - Experiment
 /*
@@ -46,16 +50,7 @@ public class PluginManager {
             System.out.println("method = " + method.getName());
         }
 */
-        
-        
-        
-        
-        /*        switch (plugin)
-         * {
-         * case "static":
-         * StaticPlugin pm = new StaticPlugin(url.getUrl());
-         * String file = pm.getSite();
-         * }*/        
+     
     }
     
     public void startPlugin(UrlClass url) throws IOException, ParseException

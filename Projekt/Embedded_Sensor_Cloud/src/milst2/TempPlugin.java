@@ -4,10 +4,7 @@
  */
 package milst2;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.sql.*;
 import java.text.ParseException;
@@ -16,6 +13,11 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.*;
 
 /**
  *
@@ -23,17 +25,12 @@ import javax.swing.JOptionPane;
  */
 public class TempPlugin {
         
+    //stellt verbindung zur Datenbank her & ruft entsprechende Funktion zum abrufen der Daten auf
     public void getTemp(Socket sock, UrlClass url) throws IOException, ParseException
     {
         ArrayList<String> urlParts = url.getTokens();
         int count = urlParts.size();
-        
-        String dateString, file = "temp.html";
-        File f = new File("files/" + file);
-        FileWriter writer = new FileWriter(f);
-        BufferedWriter out = new BufferedWriter(writer);
-        out.write("<!DOCTYPE html>\n<html>\n<head>\n<title>SWE1 - Temperatures</title>\n");
-        out.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n</head>\n<body>\n<H1>Temperatures:</H1>\n<BR/>\n");
+        String file;
             
         try {
             //Datenbank Treiber laden
@@ -46,50 +43,87 @@ public class TempPlugin {
         try (Connection db = DriverManager.getConnection("jdbc:sqlserver://localhost\\sqlexpress;" + "databaseName=SWE1", "swe1", "test")) 
 
         {
-            PreparedStatement cmd;
-              // Parameter setzen
-            if (count != 4)
+            if (count != 4) //Anzahl der Teile der Url
             {
-                this.tempAll(db, out, url);
+                this.tempAll(db, url);
+                file = "temp.html";
             }else{
-                cmd = db.prepareStatement("SELECT[date], [temp] FROM [temperature] WHERE [date] = ?");
-                StringBuilder sb = new StringBuilder();
-                sb.append(urlParts.get(1));
-                sb.append("-");
-                sb.append(urlParts.get(2));
-                sb.append("-");
-                sb.append(urlParts.get(3));
-                dateString = sb.toString();
-                cmd.setString(1, dateString);
-//                System.out.println(dateString);
+                
+                this.tempDate(db, url);
+                file = "temp.xml";
+            }
             
-                try (ResultSet rd = cmd.executeQuery())
-                {
-                    while(rd.next())
-                    {
-                        sb = new StringBuilder();
-                        sb.append(rd.getDate(1));
-                        sb.append(": ");
-                        sb.append(rd.getFloat(2));
-
-                        out.write(sb.toString());
-                        out.write("<br/>\n");
-                    }
-                }
-            }      
+            new Response(sock, file).sendResponse();
+            
         }catch (SQLException ex) {
             Logger.getLogger(TempPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    
+    private void tempDate(Connection db, UrlClass url) throws SQLException, IOException
+    {
+        try {
+            String dateString;
+            PreparedStatement cmd;
+            ArrayList<String> urlParts = url.getTokens();
             
-            out.write("</body>\n</html>");
-            out.flush();
-            new Response(sock, file).sendResponse();
+            cmd = db.prepareStatement("SELECT[date], [temp] FROM [temperature] WHERE [date] = ?");
+            StringBuilder sb = new StringBuilder();
+            sb.append(urlParts.get(1));
+            sb.append("-");
+            sb.append(urlParts.get(2));
+            sb.append("-");
+            sb.append(urlParts.get(3));
+            dateString = sb.toString();
+            cmd.setString(1, dateString);
+    //      System.out.println(dateString);
+            
+            Document xml = newDocument("temperatures");
+            Element root = xml.getDocumentElement();
+            Node child;
+            Attr a;
+
+            try (ResultSet rd = cmd.executeQuery())
+            {
+                while(rd.next())
+                {
+                    child = xml.createElement("temperature");
+                    a = xml.createAttribute("date");
+                    a.setValue(dateString);
+                    child.getAttributes().setNamedItem(a);
+                    sb = new StringBuilder();
+                    sb.append(rd.getFloat(2));
+                    child.appendChild(xml.createTextNode(sb.toString()));
+                    root.appendChild(child);
+                }
+            }
+                // write the content into xml file
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            DOMSource source = new DOMSource(xml);
+            StreamResult result = new StreamResult(new File("files/temp.xml")); //ev. temporäres file verwenden
+            transformer.transform(source, result);
+                    
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(TempPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransformerConfigurationException ex) {
+            Logger.getLogger(TempPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransformerException ex) {
+            Logger.getLogger(TempPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
     
-    private void tempAll(Connection db, BufferedWriter out, UrlClass url) throws SQLException, IOException
+    private void tempAll(Connection db, UrlClass url) throws SQLException, IOException
     {
         int count = 1, page = 1;
+        
+        String file = "temp.html";
+        File f = new File("files/" + file);//ev. temporäres file verwenden
+        FileWriter writer = new FileWriter(f);
+        BufferedWriter out = new BufferedWriter(writer);
+        out.write("<!DOCTYPE html>\n<html>\n<head>\n<title>SWE1 - Temperatures</title>\n");
+        out.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n</head>\n<body>\n<H1>Temperatures:</H1>\n<BR/>\n");
         
         if(url.getTokens().size() > 1)    
             page = Integer.parseInt(url.getTokens().get(2).toString());
@@ -131,10 +165,24 @@ public class TempPlugin {
             out.write(" name=p type=submit />\n");
         }
         out.write("</form>");
+        out.write("</body>\n</html>");
+        out.flush();
 
     }
 
-    
+    public static Document newDocument(String rootName) throws ParserConfigurationException	{
+        
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document xml = db.newDocument();
+        Node root = xml.createElement(rootName);
+        Attr a = xml.createAttribute("version");
+        a.setValue("1.0");
+        root.getAttributes().setNamedItem(a);
+        xml.appendChild(root);
+        return xml;
+
+    }
     
     //die macht nix, war nur zum probieren
     public static void main(String[] args)

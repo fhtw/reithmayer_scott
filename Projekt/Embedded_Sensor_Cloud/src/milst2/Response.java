@@ -6,7 +6,7 @@ import java.net.*;
 //import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 //import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.StringTokenizer;
 //import java.net.Socket;
 //import java.net.UnknownHostException;
 
@@ -28,10 +28,33 @@ public class Response{
     {
         try
         {
+            String conType= "text/html", fileType = "html";
+            StringTokenizer st = new StringTokenizer(this.file, ".");
+            while(st.hasMoreTokens())
+                fileType = st.nextToken();
+            System.out.println(fileType);
+            
+            switch(fileType.toLowerCase())
+            {
+                case "html":
+                    conType = "text/html";
+                    break;
+                case "xml":
+                    conType = "text/xml";
+                    break;
+                case "ico":
+                    conType = "image/x-icon";
+                    break;
+                case "jpg":
+                case "jpeg":
+                    conType = "image/jpeg";
+                    break;
+            }
+            
             PrintWriter out = new PrintWriter(server.getOutputStream());
             // write to client
             out.println("HTTP/1.1 200 OK");
-            out.println("Content-Type: text/html");
+            out.println("Content-Type: " + conType);
             out.println("connection: close");
             // blank line signals the end of the header
             out.println("");
@@ -50,7 +73,6 @@ public class Response{
         catch(Exception e)
         {
             System.err.println("sth was wrong");
-            e.printStackTrace();
         }
     }
     
