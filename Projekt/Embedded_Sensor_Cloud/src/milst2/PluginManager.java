@@ -5,32 +5,45 @@
 package milst2;
 
 import java.io.IOException;
-//import java.lang.reflect.Method;
 import java.net.Socket;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 
 /**
  *
  * @author Angelika Reithmayer
  */
 public class PluginManager {
-    Collection<String> pluginList;
+    //ArrayList<PluginClass> pluginList;
+    HashMap<String, PluginClass> plugins;
     Socket socket;
 
-    public PluginManager(Socket s) {
-        this.pluginList = new ArrayList<>();
-        this.socket = s;
+    public PluginManager() {
+        //this.pluginList = new ArrayList<>();
+        this.plugins = new HashMap();
     }
     
-    public void loadPlugin(UrlClass url) throws ClassNotFoundException
+    public void loadPlugins()
     {
-        String plugin = url.getPlugin();
+/*        String plugin = url.getPlugin();
         if(!pluginList.contains(plugin))
             pluginList.add(plugin);
-        
-        
+*/
+        NavPlugin np = new NavPlugin();
+        if(!plugins.containsKey("np"))
+        {
+            np.load();
+            plugins.put("np", np);
+        }
+            
+/*        
+        if(!pluginList.contains(np))
+        {
+            np.load();
+            pluginList.add(np);
+        }
+*/        
         //PluginManager sollte nachsehen ob benötigtes Plugin bereits geladen ist, falls nicht suchen ob es zum laden vorhanden ist?
         //mittels jar file???
         
@@ -53,8 +66,9 @@ public class PluginManager {
      
     }
     
-    public void startPlugin(UrlClass url) throws IOException, ParseException
+    public void startPlugin(UrlClass url, Socket s) throws IOException, ParseException
     {
+        this.socket = s;
         ArrayList<String> urlParts = url.getTokens();
         String plugin;
         
@@ -74,7 +88,8 @@ public class PluginManager {
                 break;
             case "navi":
                 
-                NavPlugin np = new NavPlugin();
+                PluginClass np = plugins.get("np");
+                System.out.println(plugins.get("np").getClass().toString());
                 np.start(socket, url);
                 break;
             case "static":

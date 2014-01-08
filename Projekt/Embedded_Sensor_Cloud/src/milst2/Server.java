@@ -11,12 +11,14 @@ import java.util.logging.Logger;
  */
 public class Server implements Runnable
 {
-    private Socket server;
+    private Socket sock;
     private UrlClass url;
+    private PluginManager _pm;
 
-    Server(Socket server)
+    Server(Socket server, PluginManager pm)
     {
-      this.server=server;
+      this.sock=server;
+      this._pm = pm;
     }
 
     @Override
@@ -25,22 +27,20 @@ public class Server implements Runnable
         try
         {
             System.out.println("\nThread started: " + Thread.currentThread() + "\n");
-            Request req = new Request(server);
+            Request req = new Request(sock);
             url = req.readRequest();
             if(url != null)
             {
-                PluginManager pm = new PluginManager(server);
-                pm.loadPlugin(url);
-                pm.startPlugin(url);
+                //PluginManager pm = new PluginManager(sock);
+                //pm.loadPlugin(url);
+                _pm.startPlugin(url, sock);
             }
-            server.close();
+            sock.close();
             System.out.println("\nclosed Connection " + Thread.currentThread() + "\n");
         }
         catch (IOException ioe)
         {
             System.out.println("IOException on socket listen: " + ioe);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }

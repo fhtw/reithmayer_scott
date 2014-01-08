@@ -22,7 +22,8 @@ public class Request {
     {
         try
         {
-            BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream(), "UTF-8"));
+            
             String line = in.readLine();
             if(line != null)
             {

@@ -18,14 +18,15 @@ public class Main
             ServerSocket listener = new ServerSocket(port, 100);
             Socket server;
 
-
+            PluginManager pm = new PluginManager();
+            pm.loadPlugins();
             
             while(true) //endlos
             {
                 server = listener.accept();
                 System.out.println("Connection established\n");
                 // Thread erzeugen und gleich NewThread starten
-                Thread t = new Thread(new Server(server));
+                Thread t = new Thread(new Server(server, pm));
                 t.start();
             }
         }
