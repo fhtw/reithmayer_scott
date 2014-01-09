@@ -15,21 +15,15 @@ import java.util.HashMap;
  * @author Angelika Reithmayer
  */
 public class PluginManager {
-    //ArrayList<PluginClass> pluginList;
     HashMap<String, PluginClass> plugins;
     Socket socket;
 
     public PluginManager() {
-        //this.pluginList = new ArrayList<>();
         this.plugins = new HashMap();
     }
     
     public void loadPlugins()
     {
-/*        String plugin = url.getPlugin();
-        if(!pluginList.contains(plugin))
-            pluginList.add(plugin);
-*/
         NavPlugin np = new NavPlugin();
         if(!plugins.containsKey("np"))
         {
@@ -37,13 +31,6 @@ public class PluginManager {
             plugins.put("np", np);
         }
             
-/*        
-        if(!pluginList.contains(np))
-        {
-            np.load();
-            pluginList.add(np);
-        }
-*/        
         //PluginManager sollte nachsehen ob benötigtes Plugin bereits geladen ist, falls nicht suchen ob es zum laden vorhanden ist?
         //mittels jar file???
         
@@ -98,6 +85,5 @@ public class PluginManager {
                 sp.start();
                 break;
         }
-
     }
 }

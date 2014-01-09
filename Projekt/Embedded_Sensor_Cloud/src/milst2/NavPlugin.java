@@ -36,12 +36,15 @@ public class NavPlugin extends PluginClass{
         ArrayList<String> urlParts = url.getTokens();
         int count = urlParts.size();
 
-            if (count != 3) //Anzahl der Teile der Url
+            if (count < 3) //Anzahl der Teile der Url
             {
                 this.search();
-            }else{
-                
-                this.result(url);
+            }else if(urlParts.get(1).equalsIgnoreCase("s"))
+            {
+               this.result(url);
+            }else
+            {
+                this.load();
             }
             
             new Response(socket, "nav.html").sendResponse();
@@ -55,7 +58,10 @@ public class NavPlugin extends PluginClass{
             writer = new FileWriter(f);
             BufferedWriter out = new BufferedWriter(writer);
             out.write("<!DOCTYPE html>\n<html>\n<head>\n<title>SWE1 - Navi</title>\n");
-            out.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n</head>\n<body>\n<H1>Navi:</H1>\n<BR/>\n");
+            out.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n</head>\n<body>\n<H1>Navi:</H1>\n");
+            out.write("<form method=\"GET\" action=\"Navi\">\n");
+            out.write("<input type=submit value=\"reload map\" name=f />\n");
+            out.write("</form>\n");
             out.write("<form method=\"GET\" action=\"Navi\" >\n");
             out.write("<p>Straße: </p>\n");
             out.write("<input name=s />\n");
@@ -128,114 +134,101 @@ public class NavPlugin extends PluginClass{
                 Logger.getLogger(NavPlugin.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
-               
     }
 
     @Override
     public void load()
     {
-            try {
- 
-	SAXParserFactory factory = SAXParserFactory.newInstance();
-	SAXParser saxParser = factory.newSAXParser();
- 
-	DefaultHandler handler = new DefaultHandler() {
- 
-	boolean bfname = false;
-	boolean blname = false;
-	boolean bnname = false;
-	boolean bsalary = false;
-        String key = null;
-        String val = null;
-        ArrayList values;
-        
-        @Override
-        public void startDocument() throws SAXException {
-    tags = new HashMap<>();
-}
-
-        @Override
-        public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException 
+        try
         {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser saxParser = factory.newSAXParser();
 
-
-    		if (qName.equalsIgnoreCase("node")) {
-			bfname = true;
-                        //System.out.println("Start Element :" + qName);
-                }
-    		if (qName.equalsIgnoreCase("tag")) {
-			blname = true;
-                        //System.out.println("Start Element :" + qName);
-                }
-    
-    
-    
-    if(bfname && blname)
-    {
-                    for ( int i = 0; i < atts.getLength(); i++ )
-                    {
-                        if(atts.getValue(i).equalsIgnoreCase("addr:city"))
-                        {
-                            val = atts.getValue( i+1 );
-                        }
-                        if(atts.getValue(i).equalsIgnoreCase("addr:street"))
-                        {
-                            key = atts.getValue( i+1 );
-                        }
-                    }
-            
-        if(key != null && val != null)
-        {
-            if((values = tags.get(key)) == null)
-                values = new ArrayList();
-            if(values == null || !values.contains(val))
+            DefaultHandler handler = new DefaultHandler() 
             {
-                values.add(val);
-                tags.put(key, values);
-            }
-        }
-        
-    }
-}
-         @Override
-	public void endElement(String uri, String localName,
-		String qName) throws SAXException {
- 
-		//System.out.println("End Element :" + qName);
-                if (qName.equalsIgnoreCase("node")) {
-			bfname = false;
-                        //System.out.println("End Element :" + qName);
-		}
-                if (qName.equalsIgnoreCase("tag")) {
-			blname = false;
-                        //System.out.println("End Element :" + qName);
-		}
+
+                boolean node = false;
+                boolean tag = false;
+                String key = null;
+                String val = null;
+                ArrayList values;
+
+                @Override
+                public void startDocument() throws SAXException {
+                    tags = new HashMap<>();
+                }
+
+                @Override
+                public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException 
+                {
+                    if (qName.equalsIgnoreCase("node")) {
+                            node = true;
+                            //System.out.println("Start Element :" + qName);
+                    }
+                    if (qName.equalsIgnoreCase("tag")) {
+                            tag = true;
+                            //System.out.println("Start Element :" + qName);
+                    }
+
+                    if(node && tag)
+                    {
+                        for ( int i = 0; i < atts.getLength(); i++ )
+                        {
+                            if(atts.getValue(i).equalsIgnoreCase("addr:city"))
+                            {
+                                val = atts.getValue( i+1 );
+                            }
+                            if(atts.getValue(i).equalsIgnoreCase("addr:street"))
+                            {
+                                key = atts.getValue( i+1 );
+                            }
+                        }
+
                         if(key != null && val != null)
                         {
-                            key=null;
-                            val=null;
+                            if((values = tags.get(key)) == null)
+                                values = new ArrayList();
+                            if(values == null || !values.contains(val))
+                            {
+                                values.add(val);
+                                tags.put(key, values);
+                            }
                         }
 
-	}
+                    }
+                }
+                @Override
+                public void endElement(String uri, String localName, String qName) throws SAXException
+                {
+                    //System.out.println("End Element :" + qName);
+                    if (qName.equalsIgnoreCase("node")) {
+                            node = false;
+                            //System.out.println("End Element :" + qName);
+                    }
+                    if (qName.equalsIgnoreCase("tag")) {
+                            tag = false;
+                            //System.out.println("End Element :" + qName);
+                    }
+                    if(key != null && val != null)
+                    {
+                        key=null;
+                        val=null;
+                    }
 
-        @Override
-        public void endDocument() throws SAXException {
-    // ...
-        }
-     };
- 
-       saxParser.parse("files/nav/isle-of-man-latest.osm", handler);
-//    System.out.println(tags);
-/*    
-    for (ArrayList e : tags.values()) {
+                }
 
-            System.out.println(e);
-        } 
-*/ 
-       System.out.println("NavPlugin geladen");
+                @Override
+                public void endDocument() throws SAXException {
+                    // ...
+                }
+            };
+
+        saxParser.parse("files/nav/isle-of-man-latest.osm", handler);
+
+        System.out.println("NavPlugin geladen");
+
         }catch (SAXException | IOException | ParserConfigurationException ex) {
-                Logger.getLogger(SaxReadXml.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SaxReadXml.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

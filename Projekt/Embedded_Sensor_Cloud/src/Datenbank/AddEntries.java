@@ -38,16 +38,13 @@ public class AddEntries {
                     cmd.setDate(1, date);
                     cmd.setFloat(2, rand.nextFloat() * 30); //Random Zahl für Temperatur zw. 0 und 30
 
-//                    int rows = cmd.executeUpdate();
-//                    System.out.println(rows);
+                    int rows = cmd.executeUpdate();
+                    System.out.println(rows);
                     time -= 31556925; //10 Jahre (in Sek.) / 10000 -> Gleichverteilung...
                     date.setTime(time);
                 
                 }
             }
         }
-
-
-
     }
 }
