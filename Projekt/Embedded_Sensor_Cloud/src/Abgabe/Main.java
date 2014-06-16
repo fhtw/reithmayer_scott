@@ -19,7 +19,7 @@ public class Main
             Socket server;
 
             PluginManager pm = new PluginManager();
-            pm.loadPlugins();
+//            pm.loadPlugins();
             
             while(true) //endlos
             {

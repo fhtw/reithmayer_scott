@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><invoiceItems version="1.0"><item id="1"><description>Artikel1</description><amount>5</amount><price>8</price><ust>20</ust><invoiceId>100001</invoiceId></item><item id="2"><description>Artikel2</description><amount>2</amount><price>20</price><ust>20</ust><invoiceId>100001</invoiceId></item></invoiceItems>

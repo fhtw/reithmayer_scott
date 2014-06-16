@@ -25,11 +25,9 @@ public class StaticPlugin{
     
     public void start()
     {
-        StringTokenizer st = new StringTokenizer(this.url, "[]");
-        if(st.hasMoreTokens())
-            url = st.nextToken();
-        else
+        if(url.isEmpty() || url.equalsIgnoreCase("static")) {
             url = "index.html";
+        }
 //        System.out.println(url);
         Response resp = null;
 

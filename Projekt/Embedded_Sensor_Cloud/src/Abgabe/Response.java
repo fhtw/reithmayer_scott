@@ -7,6 +7,8 @@ import java.net.*;
 import java.io.BufferedOutputStream;
 //import java.io.FileOutputStream;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 //import java.net.Socket;
 //import java.net.UnknownHostException;
 
@@ -18,7 +20,7 @@ public class Response{
     private final Socket server;
     private final String file;
 
-    Response(Socket server, String file)
+    public Response(Socket server, String file)
     {
         this.server = server;
         this.file = file;
@@ -32,7 +34,7 @@ public class Response{
             StringTokenizer st = new StringTokenizer(this.file, ".");
             while(st.hasMoreTokens())
                 fileType = st.nextToken();
-            System.out.println(fileType);
+            System.out.println("filetype:" + fileType);
             
             switch(fileType.toLowerCase())
             {
@@ -59,6 +61,8 @@ public class Response{
             // blank line signals the end of the header
             out.println("");
             File f = new File("files/" + file);
+            if(!f.isFile())
+                f = new File("files/error.html");;
             FileInputStream input = new FileInputStream(f);
             BufferedOutputStream socketOut = new BufferedOutputStream(server.getOutputStream());
             System.out.println(f.getAbsolutePath());
@@ -72,7 +76,7 @@ public class Response{
         }
         catch(IOException e)
         {
-            System.err.println("sth was wrong");
+            Logger.getLogger(Response.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     

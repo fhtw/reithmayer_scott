@@ -27,8 +27,8 @@ public class TempPlugin {
     //stellt verbindung zur Datenbank her & ruft entsprechende Funktion zum abrufen der Daten auf
     public void getTemp(Socket sock, UrlClass url) throws IOException, ParseException
     {
-        ArrayList<String> urlParts = url.getTokens();
-        int count = urlParts.size();
+        ArrayList<String> parameters = url.getParameters();
+        int count = parameters.size();
         String file;
             
         try {
@@ -42,7 +42,7 @@ public class TempPlugin {
         try (Connection db = DriverManager.getConnection("jdbc:sqlserver://localhost\\sqlexpress;" + "databaseName=SWE1", "swe1", "test")) 
 
         {
-            if (count != 4) //Anzahl der Teile der Url
+            if (count != 3) //Anzahl der Teile der Url
             {
                 this.tempAll(db, url);
                 file = "temp.html";
@@ -65,15 +65,15 @@ public class TempPlugin {
         try {
             String dateString;
             PreparedStatement cmd;
-            ArrayList<String> urlParts = url.getTokens();
+            ArrayList<String> parameters = url.getParameters();
             
             cmd = db.prepareStatement("SELECT[date], [temp] FROM [temperature] WHERE [date] = ?");
             StringBuilder sb = new StringBuilder();
-            sb.append(urlParts.get(1));
+            sb.append(parameters.get(0));
             sb.append("-");
-            sb.append(urlParts.get(2));
+            sb.append(parameters.get(1));
             sb.append("-");
-            sb.append(urlParts.get(3));
+            sb.append(parameters.get(2));
             dateString = sb.toString();
             cmd.setString(1, dateString);
     //      System.out.println(dateString);
@@ -124,8 +124,8 @@ public class TempPlugin {
         out.write("<!DOCTYPE html>\n<html>\n<head>\n<title>SWE1 - Temperatures</title>\n");
         out.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n</head>\n<body>\n<H1>Temperatures:</H1>\n<BR/>\n");
         
-        if(url.getTokens().size() > 1)    
-            page = Integer.parseInt(url.getTokens().get(2).toString());
+        if(url.getParameters().size() == 2)    
+            page = Integer.parseInt(url.getParameters().get(1));
         PreparedStatement cmd = db.prepareStatement("SELECT[date], [temp] FROM [temperature] WHERE [id] >= ? AND [id] < ?");
         cmd.setInt(1, page*20-19);
         cmd.setInt(2, page*20);
@@ -150,7 +150,7 @@ public class TempPlugin {
         {
             out.write("<input value=");
             page--;
-            System.out.println(page);
+            System.out.println("prev page: " + page);
             out.write("\""+page+"\"");
             out.write(" name=p type=submit />\n");
             page++;
@@ -159,7 +159,7 @@ public class TempPlugin {
         {
             out.write("<input value=");
             page++;
-            System.out.println(page);
+            System.out.println("next page: " + page);
             out.write("\""+page+"\"");
             out.write(" name=p type=submit />\n");
         }
